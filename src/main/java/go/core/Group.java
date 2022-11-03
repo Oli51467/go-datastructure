@@ -15,15 +15,15 @@ public class Group {
     }
 
     public Group(Point Point, Player owner) {
-        stones = new HashSet<Point>();
+        stones = new HashSet<>();
         stones.add(Point);
         this.owner = owner;
-        liberties = new HashSet<Point>(Point.getEmptyNeighbors());
+        liberties = new HashSet<>(Point.getEmptyNeighbors());
     }
 
     public Group(Group Group) {
-        this.stones = new HashSet<Point>(Group.stones);
-        this.liberties = new HashSet<Point>(Group.liberties);
+        this.stones = new HashSet<>(Group.stones);
+        this.liberties = new HashSet<>(Group.liberties);
         this.owner = Group.owner;
     }
 
@@ -45,10 +45,9 @@ public class Group {
         this.liberties.remove(playedStone);
     }
 
-    public Group removeLiberty(Point playedStone) {
+    public void removeLiberty(Point playedStone) {
         Group newGroup = new Group(stones, liberties, owner);
         newGroup.liberties.remove(playedStone);
-        return newGroup;
     }
 
     public void die() {
@@ -59,6 +58,5 @@ public class Group {
                 Group.liberties.add(rollingStone);
             }
         }
-        this.owner.addCapturedStones(this.stones.size());
     }
 }

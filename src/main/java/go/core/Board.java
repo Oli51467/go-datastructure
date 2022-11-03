@@ -8,7 +8,6 @@ public class Board {
     private final int width;
     private final int height;
     private final Point[][] Point;
-    //private Set<Point> lastCaptured;
     private Player P1, P2, actualPlayer;
     private final int initialHandicap;
     private final GameRecord gameRecord;
@@ -18,22 +17,20 @@ public class Board {
         this.width = width;
         this.height = height;
         this.initialHandicap = handicap;
-        this.Point = new Point[width][height];
-        this.gameRecord = new GameRecord(width, height, handicap);
+        this.Point = new Point[width + 1][height + 1];
+        this.gameRecord = new GameRecord(width, height);
         initBoard();
     }
 
     private void initBoard() {
-        //lastCaptured = new HashSet<Point>();
-
         // 初始化对局双方
         P1 = new Player(1);
         P2 = new Player(2);
         actualPlayer = P1;
 
         // 初始化棋盘
-        for (int x = 0; x < this.width; x++) {
-            for (int y = 0; y < this.height; y++) {
+        for (int x = 1; x <= this.width; x++) {
+            for (int y = 1; y <= this.height; y++) {
                 Point[x][y] = new Point(this, x, y);
             }
         }
@@ -41,7 +38,7 @@ public class Board {
     }
 
     public boolean isInBoard(int x, int y) {
-        return (x >= 0 && x < width && y >= 0 && y < height);
+        return (x > 0 && x <= width && y > 0 && y <= height);
     }
 
     public boolean isInBoard(Point Point) {
@@ -94,7 +91,7 @@ public class Board {
             }
         }
 
-        currentTurn = gameRecord.getLastTurn().toNext(Point.getX(), Point.getY(), player.getIdentifier(), getHandicap(), capturedStones);
+        currentTurn = gameRecord.getLastTurn().toNext(Point.getX(), Point.getY(), player.getIdentifier(), capturedStones);
         for (GameTurn turn : gameRecord.getTurns()) {
             if (turn.equals(currentTurn)) {
                 ko = true;
@@ -104,7 +101,6 @@ public class Board {
         // 判断打劫
         if (ko) {
             for (Group chain : capturedGroups) {
-                chain.getOwner().removeCapturedStones(chain.getStones().size());
                 for (Point stone : chain.getStones()) {
                     stone.setGroup(chain);
                 }
@@ -172,9 +168,9 @@ public class Board {
     @Override
     public String toString() {
         String board = "";
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                Point cross = Point[x][y];
+        for (int y = 1; y <= width; y++) {
+            for (int x = 1; x <= height; x++) {
+                Point cross = Point[y][x];
                 if (cross.getGroup() == null) {
                     board += "· ";
                 } else {

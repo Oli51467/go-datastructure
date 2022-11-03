@@ -45,10 +45,9 @@ public class Point {
 
     // 拿到相邻棋子所属的组
     public Set<Group> getAdjacentGroups() {
-        Set<Group> adjacentGroups = new HashSet<Group>();
+        Set<Group> adjacentGroups = new HashSet<>();
 
         int[] dx = {-1, 0, 1, 0}, dy = {0, -1, 0, 1};
-        //assert dx.length == dy.length : "dx and dy should have the same length";
 
         for (int i = 0; i < dx.length; i++) {
             int newX = x + dx[i];
@@ -65,11 +64,9 @@ public class Point {
     }
 
     public List<Point> getEmptyNeighbors() {
-        List<Point> emptyNeighbors = new ArrayList<Point>();
+        List<Point> emptyNeighbors = new ArrayList<>();
 
         int[] dx = {-1, 0, 1, 0}, dy = {0, -1, 0, 1};
-        //assert dx.length == dy.length : "dx and dy should have the same length";
-
         for (int i = 0; i < dx.length; i++) {
             int newX = x + dx[i];
             int newY = y + dy[i];

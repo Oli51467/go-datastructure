@@ -5,11 +5,9 @@ import java.util.Stack;
 public class GameRecord {
 
     private final Stack<GameTurn> preceding;
-
-
     private final Stack<GameTurn> following;
 
-    public GameRecord(int width, int height, int handicap) {
+    public GameRecord(int width, int height) {
         preceding = new Stack<>();
         following = new Stack<>();
         GameTurn first = new GameTurn(width, height);
@@ -40,7 +38,7 @@ public class GameRecord {
 
         GameRecord castedObj = (GameRecord) obj;
 
-        if (preceding.size() != castedObj.preceding.size() | following.size() != following.size()) return false;
+        if (preceding.size() != castedObj.preceding.size()) return false;
 
         for (int i = 0; i < preceding.size(); i++) {
             if (!preceding.get(i).equals(castedObj.preceding.get(i))) return false;
