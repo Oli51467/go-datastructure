@@ -1,7 +1,5 @@
 package go.core;
 
-import java.util.*;
-
 // 棋盘
 public class Board {
     public final static int EMPTY = 0;

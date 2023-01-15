@@ -71,15 +71,7 @@ public class Group {
         return liberties;
     }
 
-    public void setLiberties(int liberties) {
-        this.liberties = liberties;
-    }
-
     public int getLength() {
         return length;
-    }
-
-    public void setLength(int length) {
-        this.length = length;
     }
 }

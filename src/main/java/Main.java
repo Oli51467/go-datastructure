@@ -18,7 +18,6 @@ public class Main {
                 System.out.println("正常落子！" + '\n');
             }
             else System.out.println("这里不可以落子！" + '\n');
-            board.to2String();
         }
     }
 }

@@ -4,12 +4,10 @@ package go.core;
 public class Point {
     private int x;
     private int y;
-    private int color;
 
     public Point(int x, int y, int color) {
         this.x = x;
         this.y = y;
-        this.color = color;
     }
 
     public Point(int x, int y) {
