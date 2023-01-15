@@ -3,60 +3,83 @@ package go.core;
 import java.util.HashSet;
 import java.util.Set;
 
+import static go.core.Board.*;
+
 public class Group {
-    private final Set<Point> stones;
-    private final Set<Point> liberties;
-    private final Player owner;
 
-    public Group(Set<Point> stones, Set<Point> liberties, Player owner) {
-        this.stones = stones;
-        this.liberties = liberties;
-        this.owner = owner;
-    }
+    private int liberties;
 
-    public Group(Point Point, Player owner) {
+    private int length;
+
+    public Set<Point> stones;
+
+    private boolean[][] st;
+
+    public Group(int x, int y, int color) {
+        this.liberties = 0;
+        this.length = 1;
         stones = new HashSet<>();
-        stones.add(Point);
-        this.owner = owner;
-        liberties = new HashSet<>(Point.getEmptyNeighbors());
+        st = new boolean[20][20];
+        reset();
+        add2Group(x, y, color);
     }
 
-    public Group(Group Group) {
-        this.stones = new HashSet<>(Group.stones);
-        this.liberties = new HashSet<>(Group.liberties);
-        this.owner = Group.owner;
+    private void add2Group(int x, int y, int color) {
+        Point point = new Point(x, y, color);
+        stones.add(point);
     }
 
-    public Player getOwner() {
-        return owner;
+    private void reset() {
+        for (int x = 1; x <= 19; x++) {
+            for (int y = 1; y <= 19; y++) {
+                st[x][y] = false;
+            }
+        }
     }
 
-    public Set<Point> getLiberties() {
+    public boolean isInBoard(int x, int y) {
+        return (x > 0 && x <= 19 && y > 0 && y <= 19);
+    }
+
+    private void getGroupLength(int x, int y, int color) {
+        for (int i = 0; i < 4; i ++ ) {
+            int nx = x + dx[i], ny = y + dy[i];
+            if (!isInBoard(nx, ny) || st[nx][ny]) continue;
+            if (board[nx][ny] == EMPTY) {
+                this.liberties ++;
+                st[nx][ny] = true;
+                continue;
+            }
+            if (board[nx][ny] != color) {
+                st[nx][ny] = true;
+                continue;
+            }
+            st[nx][ny] = true;
+            this.length ++;
+            add2Group(nx, ny, color);
+            getGroupLength(nx, ny, color);
+        }
+    }
+
+    // 从一个点开始 遍历从这个点延伸出去的组的长度和气
+    public void getGroupLengthAndLiberty(int x, int y, int color) {
+        reset();
+        getGroupLength(x, y, color);
+    }
+
+    public int getLiberties() {
         return liberties;
     }
 
-    public Set<Point> getStones() {
-        return stones;
+    public void setLiberties(int liberties) {
+        this.liberties = liberties;
     }
 
-    public void add(Group Group, Point playedStone) {
-        this.stones.addAll(Group.stones);
-        this.liberties.addAll(Group.liberties);
-        this.liberties.remove(playedStone);
+    public int getLength() {
+        return length;
     }
 
-    public void removeLiberty(Point playedStone) {
-        Group newGroup = new Group(stones, liberties, owner);
-        newGroup.liberties.remove(playedStone);
-    }
-
-    public void die() {
-        for (Point rollingStone : this.stones) {
-            rollingStone.setGroup(null);
-            Set<Group> adjacentGroups = rollingStone.getAdjacentGroups();
-            for (Group Group : adjacentGroups) {
-                Group.liberties.add(rollingStone);
-            }
-        }
+    public void setLength(int length) {
+        this.length = length;
     }
 }
