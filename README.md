@@ -1,4 +1,4 @@
-# Go  围棋游戏的数据结构
+# Go  围棋游戏的数据结构 (仅150行实现！English version below)
 
 围棋是一种策略棋类，使用格状棋盘及黑白二色棋子进行对弈。起源于中国，中国古时有“弈”、“碁”、“手谈”等多种称谓，属琴棋书画四艺。西方称之为“Go”，是源自日语“碁”的发音。
 
@@ -81,8 +81,95 @@
 ```getGroupLength```: 从一颗棋子开始延伸，遍历所有联通该棋子的且与该棋子同色的所有棋子，并记录它的气和长度。
 采用递归的方法遍历。
 
-有更多问题可以尽管提出，欢迎！
+有更多问题可以尽管提出，欢迎！🌟🌟🌟
 
+# Go  The data structure of the game of Go (only 150 lines to achieve!)
+
+Go is a strategic game that uses a grid-like board and black and white pieces. Originated in China, in ancient China, there were many titles such as "Yi", "Qi" and "Shoutan". It belongs to the four arts of piano, chess, calligraphy and painting. It is called "Go" in the west, which is derived from the pronunciation of "颁" in Japanese.
+
+
+### basic rules
+
+When playing chess, the two players each hold a piece of one color, black first and then white, and take turns placing a piece on the intersection. 
+
+The blank intersections connected with the pawns in a straight line are called qi. 
+
+When all the qi is occupied by the opponent's pieces, the piece has no "qi" and will be removed from the board.
+
+
+### no suicide rule
+
+When you make a move, unless you can make some of the opponent's pieces lose all their energy, you must not make some of your own pieces lose all of your energy. This is also known as the "No Suicide Rule".
+
+
+### Data Structure
+
+#### Board Class
+
+Abstractly depicts a Go board
+
+##### Variable
+```height width```：The specification of the chessboard, the coordinate system is the positive direction of the x-axis facing right, and the positive direction of the y-axis facing downward
+
+
+```player```：The party that should be placed
+
+```sgfRecord```：Used to record the chess game (a string for convenient storage and transmission, and other forms can also be used to record each step)
+
+```st```:Auxiliary array to record whether a grid point is traversed
+
+```blackForbidden ｜ whiteForbidden```: Record a partially formed black and white forbidden entry point after the robbery.
+
+##### Note: Here only the forbidden entry points formed by robbery are recorded, and the forbidden entry points for suicide are not recorded, but only judged.
+
+
+##### Methods
+```getAllGroupsLengthAndLiberty```：
+
+Use **Flood Fill** to traverse all positions on the board, if there is no chess piece in this position, then
+jump over. If there is a chess piece, start from the chess piece to traverse all the same-color chess pieces (groups) connected to the chess piece, (even if there is only one chess piece in the group).
+
+After the traversal is complete, get the length of the group and all of its gas. According to the rules of Go, when a move falls, it is impossible to kill other groups except the group to which the child belongs, so Here it is only necessary to judge whether one or some groups of the other party are killed.
+
+A part forms a robbery if and only if: **After the piece falls, the group where the piece is located loses all Qi and the group where the piece is located has only one piece (ie itself)&&After the piece falls, the opponent has only one group that loses all the gas and this group has only one chess piece.** If the part forms a robbery, update the opponent's forbidden entry point, the forbidden entry point is After the piece falls, the opponent is lifted to the position of the only piece that has been eaten.
+
+```play```：Determine whether a move can be made on the board, if so, update the board, if not, update nothing.
+
+1. If the point is outside the chessboard or there is already a piece at the point, the piece cannot be placed, and return **false**
+2. If the point is within the robbing forbidden point recorded by the party, it is not allowed to place a ball and return **false**
+3. After excluding the above two situations, you must be able to make a move (there is no counterexample)
+
+After the judgment can be made:
+1. empty the auxiliary array
+2. actually update the piece on the board (very important)
+3. Iterate through the entire group that the child belongs to, and record the length of the group
+4. Traverse the board, check if the opponent has a piece or a string of pieces captured
+5. If there is no opponent and no pieces are taken, and you lose all your Qi after the piece is dropped, then **this behavior is suicide, and the piece is invalid**, restore the chessboard at this position, and return **false**
+6. Otherwise, you can place a piece at this position and clear all your forbidden entry points, because the validity of this position means that this is a robbery, and all subsequent robberies can be placed.
+
+
+#### Group Class
+The qi and length of a string of chess pieces are recorded, as well as the position information included in the string of chess pieces.
+
+##### Variable
+```liberties```: determinate whether the stones can live
+
+```lenght```: How many chess pieces are included in this group
+
+```stones```: The positions of all pieces in the group
+
+```st```： Auxiliary array for Flood Fill traversal
+
+##### Methods
+
+```add2Group```: Add a pawn to the group
+
+```getGroupLength```: Extend from a chess piece, traverse all the chess pieces that are connected to the chess piece and of the same color as the chess piece, and record its qi and length.
+Use recursive method to traverse.
+
+Feel free to ask more questions, welcome!
+
+ Please Star if you think its useful :) thanks!
 
 
 
