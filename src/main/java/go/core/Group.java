@@ -25,7 +25,7 @@ public class Group {
     }
 
     private void add2Group(int x, int y, int color) {
-        Point point = new Point(x, y, color);
+        Point point = new Point(x, y);
         stones.add(point);
     }
 
@@ -57,6 +57,7 @@ public class Group {
             st[nx][ny] = true;
             this.length ++;
             add2Group(nx, ny, color);
+            // 递归判断
             getGroupLength(nx, ny, color);
         }
     }

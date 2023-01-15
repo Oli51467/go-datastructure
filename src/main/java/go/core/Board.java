@@ -33,6 +33,7 @@ public class Board {
         }
         if (handicap == 0) player = BLACK;
         else player = WHITE;
+        // 如果有让子 记录让子
         for (int x = 4; x <= 16; x += 6) {
             for (int y = 4; y <= 16; y += 6) {
                 if (handicap != 0) {
@@ -43,16 +44,28 @@ public class Board {
         }
     }
 
+    /**
+     * 当一方落子有效后 切换落子方
+     */
     private void changePlayer() {
         if (player == BLACK) player = WHITE;
         else player = BLACK;
     }
 
+    /**
+     * 判断一步落子是否在棋盘内
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @return 是否在棋盘内
+     */
     public boolean isInBoard(int x, int y) {
         return (x > 0 && x <= width && y > 0 && y <= height);
     }
 
-    private void resetst() {
+    /**
+     * 重置辅助数组
+     */
+    private void reset() {
         for (int i = 1; i <= this.height; i++) {
             for (int j = 1; j <= this.width; j++) {
                 st[i][j] = false;
@@ -71,6 +84,7 @@ public class Board {
                 // 这里的（x, y）一定是一个新的group
                 Group group = new Group(x, y, board[x][y]);
                 group.getGroupLengthAndLiberty(x, y, board[x][y]);
+                // 一次性把该组都加入到辅助数组中
                 for (Point stone : group.stones) {
                     st[stone.getX()][stone.getY()] = true;
                 }
@@ -91,6 +105,7 @@ public class Board {
                 }
             }
         }
+        // 该局部形成打劫，更新禁入点的位置即为被提吃的位置
         if (count == 1 && selfCount == 1) {
             if (player == BLACK) {
                 whiteForbidden.setX(koX);
@@ -115,7 +130,8 @@ public class Board {
             }
         }
         board[x][y] = player;
-        resetst();
+        reset();
+        // 记录组的长度
         int selfCount = 0;
         Group curGroup = new Group(x, y, player);
         curGroup.getGroupLengthAndLiberty(x, y, player);
