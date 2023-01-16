@@ -1,30 +1,30 @@
 package go.core;
 
+import lombok.Data;
+
 import java.util.HashSet;
 import java.util.Set;
 
 import static go.core.Board.*;
 
+@Data
 public class Group {
 
     private int liberties;
-
     private int length;
-
     public Set<Point> stones;
-
     private boolean[][] st;
 
-    public Group(int x, int y, int color) {
+    public Group(int x, int y) {
         this.liberties = 0;
         this.length = 1;
         stones = new HashSet<>();
         st = new boolean[20][20];
         reset();
-        add2Group(x, y, color);
+        add2Group(x, y);
     }
 
-    private void add2Group(int x, int y, int color) {
+    private void add2Group(int x, int y) {
         Point point = new Point(x, y);
         stones.add(point);
     }
@@ -56,7 +56,7 @@ public class Group {
             }
             st[nx][ny] = true;
             this.length ++;
-            add2Group(nx, ny, color);
+            add2Group(nx, ny);
             // 递归判断
             getGroupLength(nx, ny, color);
         }
@@ -66,13 +66,5 @@ public class Group {
     public void getGroupLengthAndLiberty(int x, int y, int color) {
         reset();
         getGroupLength(x, y, color);
-    }
-
-    public int getLiberties() {
-        return liberties;
-    }
-
-    public int getLength() {
-        return length;
     }
 }

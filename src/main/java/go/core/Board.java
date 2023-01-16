@@ -82,7 +82,7 @@ public class Board {
                 if (st[x][y] || board[x][y] == EMPTY) continue;
                 st[x][y] = true;
                 // 这里的（x, y）一定是一个新的group
-                Group group = new Group(x, y, board[x][y]);
+                Group group = new Group(x, y);
                 group.getGroupLengthAndLiberty(x, y, board[x][y]);
                 // 一次性把该组都加入到辅助数组中
                 for (Point stone : group.stones) {
@@ -133,7 +133,7 @@ public class Board {
         reset();
         // 记录组的长度
         int selfCount = 0;
-        Group curGroup = new Group(x, y, player);
+        Group curGroup = new Group(x, y);
         curGroup.getGroupLengthAndLiberty(x, y, player);
         for (Point stone : curGroup.stones) {
             st[stone.getX()][stone.getY()] = true;
