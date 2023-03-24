@@ -1,4 +1,4 @@
-# Go  围棋游戏的数据结构 (仅150行实现！English version below)
+# Go  围棋游戏的数据结构，可以判断某局面是否可以落子，可以判断打劫，并进行棋局记录。 (仅150行实现！English version below)
 
 围棋是一种策略棋类，使用格状棋盘及黑白二色棋子进行对弈。起源于中国，中国古时有“弈”、“碁”、“手谈”等多种称谓，属琴棋书画四艺。西方称之为“Go”，是源自日语“碁”的发音。
 
@@ -83,7 +83,7 @@
 
 有更多问题可以尽管提出，欢迎！🌟🌟🌟
 
-# Go  The data structure of the game of Go (only 150 lines to achieve!)
+# Go  The data structure of the game of Go. It can judge whether a certain situation can be played, can judge ko, and record the chess game. (only 150 lines to achieve!)
 
 Go is a strategic game that uses a grid-like board and black and white pieces. Originated in China, in ancient China, there were many titles such as "Yi", "Qi" and "Shoutan". It belongs to the four arts of piano, chess, calligraphy and painting. It is called "Go" in the west, which is derived from the pronunciation of "颁" in Japanese.
 
