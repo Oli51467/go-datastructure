@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static go.core.Board.*;
+import static go.core.common.Constants.*;
 
 @Data
 public class Group {
@@ -13,13 +14,13 @@ public class Group {
     private int liberties;
     private int length;
     public Set<Point> stones;
-    private boolean[][] st;
+    private Boolean[][] st;
 
     public Group(int x, int y) {
         this.liberties = 0;
         this.length = 1;
         stones = new HashSet<>();
-        st = new boolean[20][20];
+        st = new Boolean[WIDTH + 1][WIDTH + 1];
         reset();
         add2Group(x, y);
     }
@@ -30,31 +31,37 @@ public class Group {
     }
 
     private void reset() {
-        for (int x = 1; x <= 19; x++) {
-            for (int y = 1; y <= 19; y++) {
-                st[x][y] = false;
+        for (int x = 1; x <= WIDTH; x++) {
+            for (int y = 1; y <= WIDTH; y++) {
+                st[x][y] = Boolean.FALSE;
             }
         }
     }
 
     public boolean isInBoard(int x, int y) {
-        return (x > 0 && x <= 19 && y > 0 && y <= 19);
+        return (x > 0 && x <= WIDTH && y > 0 && y <= WIDTH);
     }
 
+    /***
+     * 从一个位置开始 递归查找与该棋子相邻的同色所有棋子
+     * @param x 位置横坐标
+     * @param y 位置纵坐标
+     * @param color 黑棋或白棋
+     */
     private void getGroupLength(int x, int y, int color) {
         for (int i = 0; i < 4; i ++ ) {
             int nx = x + dx[i], ny = y + dy[i];
             if (!isInBoard(nx, ny) || st[nx][ny]) continue;
             if (board[nx][ny] == EMPTY) {
                 this.liberties ++;
-                st[nx][ny] = true;
+                st[nx][ny] = Boolean.TRUE;
                 continue;
             }
             if (board[nx][ny] != color) {
-                st[nx][ny] = true;
+                st[nx][ny] = Boolean.TRUE;
                 continue;
             }
-            st[nx][ny] = true;
+            st[nx][ny] = Boolean.TRUE;
             this.length ++;
             add2Group(nx, ny);
             // 递归判断
