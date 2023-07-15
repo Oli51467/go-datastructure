@@ -1,12 +1,12 @@
-package go.core;
+package com.sdu.go.impl;
 
+import com.sdu.go.common.Constants;
 import lombok.Data;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static go.core.Board.*;
-import static go.core.common.Constants.*;
+import static com.sdu.go.impl.Board.*;
 
 @Data
 public class Group {
@@ -50,9 +50,9 @@ public class Group {
      */
     private void getGroupLength(int x, int y, int color, int size) {
         for (int i = 0; i < 4; i ++ ) {
-            int nx = x + dx[i], ny = y + dy[i];
+            int nx = x + Constants.dx[i], ny = y + Constants.dy[i];
             if (!isInBoard(nx, ny, size) || st[nx][ny]) continue;
-            if (board[nx][ny] == EMPTY) {
+            if (board[nx][ny] == Constants.EMPTY) {
                 this.liberties ++;
                 st[nx][ny] = Boolean.TRUE;
                 continue;

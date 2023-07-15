@@ -1,4 +1,4 @@
-package go.core;
+package com.sdu.go.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

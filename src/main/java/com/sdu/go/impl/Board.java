@@ -1,17 +1,25 @@
-package go.core;
+package com.sdu.go.impl;
 
+import com.sdu.go.common.Constants;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 
-import static go.core.common.Constants.*;
+import static com.sdu.go.common.Constants.BLACK;
+import static com.sdu.go.common.Constants.EMPTY;
 
 // 棋盘
 public class Board {
 
     private final int size;
-    private final Point blackForbidden;
-    private final Point whiteForbidden;
+    private Point blackForbidden;
+    private Point whiteForbidden;
     private final Boolean[][] st;
+    public Deque<Point> steps;
+    public Deque<String> gameRecord;
+    public Deque<Point> forbiddenList;
 
     public static Integer[][] board;
 
@@ -26,24 +34,32 @@ public class Board {
         st = new Boolean[this.size + 1][this.size + 1];
         blackForbidden = new Point(-1, -1);
         whiteForbidden = new Point(-1, -1);
-        capturedStones = new HashSet<>();
+        forbiddenList = new ArrayDeque<>();      // 每一步走完后对方的禁入点
+        forbiddenList.push(blackForbidden); // 初始黑棋没有打劫禁入点
+        gameRecord = new ArrayDeque<>();         // 每一步棋走完后的局面
+        steps = new ArrayDeque<>();              // 记录每一步
+        steps.push(blackForbidden);         // 初始为空
+        capturedStones = new HashSet<>();   // 吃子集合
         tmpCaptured = new HashSet<>();
         // 初始化棋盘
+        StringBuilder tmp = new StringBuilder();
         for (int x = 1; x <= this.size; x++) {
             for (int y = 1; y <= this.size; y++) {
                 board[x][y] = EMPTY;
                 st[x][y] = Boolean.FALSE;
+                tmp.append(EMPTY);
             }
         }
+        gameRecord.push(tmp.toString());
         if (handicap == 0) player = BLACK;
-        else player = WHITE;
+        else player = Constants.WHITE;
     }
 
     /**
      * 当一方落子有效后 切换落子方
      */
     private void changePlayer() {
-        player = player == BLACK ? WHITE : BLACK;
+        player = player == BLACK ? Constants.WHITE : BLACK;
     }
 
     /**
@@ -107,7 +123,7 @@ public class Board {
         // 该局部形成打劫，更新禁入点的位置即为被提吃的位置
         if (count == 1 && selfCount == 1) {
             if (player == BLACK) whiteForbidden.set(koX, koY);
-            else if (player == WHITE) blackForbidden.set(koX, koY);
+            else if (player == Constants.WHITE) blackForbidden.set(koX, koY);
         }
         return countEat;
     }
@@ -116,7 +132,7 @@ public class Board {
         if (!isInBoard(x, y) || board[x][y] != EMPTY) return false; // 如果落子棋盘外或者落在已有棋子的位置 非法
         if (side != player) return false;
         if (player == BLACK && blackForbidden.getX() == x && blackForbidden.getX() == y) return false;  // 如果黑棋落在禁入点 非法
-        if (player == WHITE && whiteForbidden.getX() == x && whiteForbidden.getY() == y) return false;  // 如果白棋落在禁入点 非法
+        if (player == Constants.WHITE && whiteForbidden.getX() == x && whiteForbidden.getY() == y) return false;  // 如果白棋落在禁入点 非法
         board[x][y] = player;
         reset();
         // 记录组的长度
@@ -133,7 +149,7 @@ public class Board {
             board[x][y] = EMPTY;
             return false;
         } else {
-            if (player == WHITE) whiteForbidden.set(-1, -1);
+            if (player == Constants.WHITE) whiteForbidden.set(-1, -1);
             else blackForbidden.set(-1, -1);
             if (player == BLACK) sgfRecord.append('B');
             else sgfRecord.append('W');
@@ -145,5 +161,34 @@ public class Board {
             tmpCaptured.clear();
             return true;
         }
+    }
+
+    /**
+     * 悔棋方法
+     */
+    public void regretPlay() {
+        gameRecord.pop();
+        this.steps.pop();
+        this.forbiddenList.pop();
+        // 1. 恢复棋盘状态
+        String curState = gameRecord.peek();
+        if (null == curState || curState.equals("")) return;
+        for (int i = 1; i <= this.size; i++) {
+            for (int j = 1; j <= this.size; j++) {
+                board[i][j] = Integer.parseInt(curState.substring((i - 1) * this.size + j - 1, (i - 1) * this.size + j));
+            }
+        }
+        // 2.恢复禁入点
+        Point curForbidden = this.forbiddenList.peek();     // 存的是自己的禁入点
+        if (player == BLACK) {
+            this.blackForbidden = curForbidden;
+            this.whiteForbidden = new Point(-1, -1);
+        } else {
+            this.whiteForbidden = curForbidden;
+            this.blackForbidden = new Point(-1, -1);
+        }
+        // 3. 还原落子方
+        changePlayer();
+        this.playCount --;
     }
 }
