@@ -1,4 +1,4 @@
-package com.sdu.go.common;
+package org.sdu.go.common;
 
 public class Constants {
     public final static int EMPTY = 0;

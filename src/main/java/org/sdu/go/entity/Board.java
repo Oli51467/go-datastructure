@@ -1,14 +1,11 @@
-package com.sdu.go.impl;
-
-import com.sdu.go.common.Constants;
+package org.sdu.go.entity;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.sdu.go.common.Constants.BLACK;
-import static com.sdu.go.common.Constants.EMPTY;
+import static org.sdu.go.common.Constants.*;
 
 // 棋盘
 public class Board {
@@ -16,22 +13,20 @@ public class Board {
     private final int size;
     private Point blackForbidden;
     private Point whiteForbidden;
-    private final Boolean[][] st;
+    private boolean[][] st;
+    private int[][] board;
     public Deque<Point> steps;
     public Deque<String> gameRecord;
     public Deque<Point> forbiddenList;
 
-    public static Integer[][] board;
-
     private int player, playCount;
-    public Set<Point> capturedStones, tmpCaptured;
-    public StringBuilder sgfRecord;
+    private Set<Point> capturedStones, tmpCaptured;
 
-    public Board(int size, int handicap) {
+    public Board(int size) {
         this.size = size;
         this.playCount = 0;
-        board = new Integer[this.size + 1][this.size + 1];
-        st = new Boolean[this.size + 1][this.size + 1];
+        board = new int[this.size + 2][this.size + 2];
+        st = new boolean[this.size + 2][this.size + 2];
         blackForbidden = new Point(-1, -1);
         whiteForbidden = new Point(-1, -1);
         forbiddenList = new ArrayDeque<>();      // 每一步走完后对方的禁入点
@@ -51,15 +46,26 @@ public class Board {
             }
         }
         gameRecord.push(tmp.toString());
-        if (handicap == 0) player = BLACK;
-        else player = Constants.WHITE;
+        player = BLACK;
+    }
+
+    public int getPlayCount() {
+        return playCount;
+    }
+
+    public Set<Point> getCapturedStones() {
+        return capturedStones;
+    }
+
+    public int[][] getBoard() {
+        return board;
     }
 
     /**
      * 当一方落子有效后 切换落子方
      */
     private void changePlayer() {
-        player = player == BLACK ? Constants.WHITE : BLACK;
+        player = player == BLACK ? WHITE : BLACK;
     }
 
     /**
@@ -97,7 +103,7 @@ public class Board {
                 st[x][y] = Boolean.TRUE;
                 // 这里的（x, y）一定是一个新的group
                 Group group = new Group(x, y, size);
-                group.getGroupLengthAndLiberty(x, y, board[x][y], size);
+                group.getGroupLengthAndLiberty(x, y, board[x][y], size, board);
                 // 一次性把该组都加入到辅助数组中
                 for (Point stone : group.stones) {
                     st[stone.getX()][stone.getY()] = Boolean.TRUE;
@@ -123,24 +129,24 @@ public class Board {
         // 该局部形成打劫，更新禁入点的位置即为被提吃的位置
         if (count == 1 && selfCount == 1) {
             if (player == BLACK) whiteForbidden.set(koX, koY);
-            else if (player == Constants.WHITE) blackForbidden.set(koX, koY);
+            else if (player == WHITE) blackForbidden.set(koX, koY);
         }
         return countEat;
     }
 
-    public boolean play(int x, int y, int side) {
+    public boolean play(Integer x, Integer y) {
+        if (null == x || null == y) return false;
         if (!isInBoard(x, y) || board[x][y] != EMPTY) return false; // 如果落子棋盘外或者落在已有棋子的位置 非法
-        if (side != player) return false;
         if (player == BLACK && blackForbidden.getX() == x && blackForbidden.getX() == y) return false;  // 如果黑棋落在禁入点 非法
-        if (player == Constants.WHITE && whiteForbidden.getX() == x && whiteForbidden.getY() == y) return false;  // 如果白棋落在禁入点 非法
+        if (player == WHITE && whiteForbidden.getX() == x && whiteForbidden.getY() == y) return false;  // 如果白棋落在禁入点 非法
         board[x][y] = player;
         reset();
+        Group curGroup = new Group(x, y, size);
+        curGroup.getGroupLengthAndLiberty(x, y, player, size, board);
         // 记录组的长度
         int selfCount = 0;
-        Group curGroup = new Group(x, y, size);
-        curGroup.getGroupLengthAndLiberty(x, y, player, size);
         for (Point stone : curGroup.stones) {
-            st[stone.getX()][stone.getY()] = Boolean.TRUE;
+            st[stone.getX()][stone.getY()] = true;
             selfCount ++;
         }
         int eatOppoGroups = getAllGroupsLengthAndLiberty(selfCount);    // 查找该步落下后，对手是否被吃
@@ -149,25 +155,40 @@ public class Board {
             board[x][y] = EMPTY;
             return false;
         } else {
-            if (player == Constants.WHITE) whiteForbidden.set(-1, -1);
-            else blackForbidden.set(-1, -1);
-            if (player == BLACK) sgfRecord.append('B');
-            else sgfRecord.append('W');
-            sgfRecord.append('[').append(x).append(',').append(y).append(']');
-            changePlayer();
+            if (player == WHITE) {
+                whiteForbidden.set(-1, -1);
+                forbiddenList.push(new Point(blackForbidden.getX(), blackForbidden.getY()));  // 这里一定要new新的 否则传进去的值会被修改
+            }
+            else {
+                blackForbidden.set(-1, -1);
+                forbiddenList.push(new Point(whiteForbidden.getX(), whiteForbidden.getY()));
+            }
+            steps.push(new Point(x, y));
             playCount ++;
             capturedStones.clear();
             capturedStones.addAll(tmpCaptured);
             tmpCaptured.clear();
+            changePlayer();
+            saveState();
             return true;
         }
+    }
+
+    private void saveState() {
+        StringBuilder res = new StringBuilder();
+        for (int i = 1; i <= this.size; i++) {
+            for (int j = 1; j <= this.size; j++) {
+                res.append(board[i][j]);
+            }
+        }
+        gameRecord.push(res.toString());
     }
 
     /**
      * 悔棋方法
      */
     public void regretPlay() {
-        gameRecord.pop();
+        this.gameRecord.pop();
         this.steps.pop();
         this.forbiddenList.pop();
         // 1. 恢复棋盘状态
@@ -188,7 +209,7 @@ public class Board {
             this.blackForbidden = new Point(-1, -1);
         }
         // 3. 还原落子方
+        playCount --;
         changePlayer();
-        this.playCount --;
     }
 }

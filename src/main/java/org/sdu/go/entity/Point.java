@@ -1,4 +1,4 @@
-package com.sdu.go.impl;
+package org.sdu.go.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

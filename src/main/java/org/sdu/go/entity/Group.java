@@ -1,12 +1,10 @@
-package com.sdu.go.impl;
+package org.sdu.go.entity;
 
-import com.sdu.go.common.Constants;
 import lombok.Data;
+import org.sdu.go.common.Constants;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import static com.sdu.go.impl.Board.*;
 
 @Data
 public class Group {
@@ -48,7 +46,7 @@ public class Group {
      * @param y 位置纵坐标
      * @param color 黑棋或白棋
      */
-    private void getGroupLength(int x, int y, int color, int size) {
+    private void getGroupLength(int x, int y, int color, int size, int[][] board) {
         for (int i = 0; i < 4; i ++ ) {
             int nx = x + Constants.dx[i], ny = y + Constants.dy[i];
             if (!isInBoard(nx, ny, size) || st[nx][ny]) continue;
@@ -65,13 +63,13 @@ public class Group {
             this.length ++;
             add2Group(nx, ny);
             // 递归判断
-            getGroupLength(nx, ny, color, size);
+            getGroupLength(nx, ny, color, size, board);
         }
     }
 
     // 从一个点开始 遍历从这个点延伸出去的组的长度和气
-    public void getGroupLengthAndLiberty(int x, int y, int color, int size) {
+    public void getGroupLengthAndLiberty(int x, int y, int color, int size, int[][] board) {
         reset(size);
-        getGroupLength(x, y, color, size);
+        getGroupLength(x, y, color, size, board);
     }
 }
