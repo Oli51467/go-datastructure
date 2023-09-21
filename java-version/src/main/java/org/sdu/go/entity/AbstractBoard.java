@@ -1,5 +1,7 @@
 package org.sdu.go.entity;
 
+import org.sdu.go.common.BoardType;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -15,7 +17,7 @@ public abstract class AbstractBoard implements Board {
     public Deque<Point> steps;
     public Deque<String> gameRecord = new ArrayDeque<>();
 
-    public AbstractBoard(Integer size) {
+    public AbstractBoard(Integer size, Integer handicap, BoardType type) {
         this.size = size;
         this.playCount = 0;
         this.player = BLACK;
@@ -32,6 +34,24 @@ public abstract class AbstractBoard implements Board {
         // 记录每一步,初始为空
         steps = new ArrayDeque<>();
         steps.push(new Point(-1, -1));
+        if (type == BoardType.GO) {
+            if (handicap != 0) {
+                player = WHITE;
+                if (size == 19) {
+                    handicap = Math.min(handicap, 9);
+                    for (int i = 0; i < handicap; i++) {
+                        int[] coordinates = coordinates19[i];
+                        board[coordinates[0]][coordinates[1]] = BLACK;
+                    }
+                } else if (size == 13) {
+                    handicap = Math.min(handicap, 5);
+                    for (int i = 0; i < handicap; i++) {
+                        int[] coordinates = coordinates13[i];
+                        board[coordinates[0]][coordinates[1]] = BLACK;
+                    }
+                }
+            }
+        }
     }
 
     @Override

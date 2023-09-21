@@ -1,18 +1,16 @@
 package org.sdu.go.entity;
 
-import lombok.Data;
 import org.sdu.go.common.Constants;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
 public class Group {
 
     private int liberties;
     private int length;
     public Set<Point> stones;
-    private Boolean[][] st;
+    private final Boolean[][] st;
 
     public Group(int x, int y, int size) {
         this.liberties = 0;
@@ -21,6 +19,14 @@ public class Group {
         st = new Boolean[size + 1][size + 1];
         reset(size);
         add2Group(x, y);
+    }
+
+    public int getLiberties() {
+        return liberties;
+    }
+
+    public int getLength() {
+        return length;
     }
 
     private void add2Group(int x, int y) {

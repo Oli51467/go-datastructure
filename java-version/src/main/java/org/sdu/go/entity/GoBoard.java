@@ -1,5 +1,7 @@
 package org.sdu.go.entity;
 
+import org.sdu.go.common.BoardType;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
@@ -18,7 +20,7 @@ public class GoBoard extends AbstractBoard {
     public Deque<Point> forbiddenList;
 
     public GoBoard(int size, int handicap) {
-        super(size);
+        super(size, handicap, BoardType.GO);
         st = new boolean[this.size + 2][this.size + 2];
         blackForbidden = new Point(-1, -1);
         whiteForbidden = new Point(-1, -1);
@@ -28,20 +30,6 @@ public class GoBoard extends AbstractBoard {
         forbiddenList.push(blackForbidden); // 初始黑棋没有打劫禁入点
         // 初始化棋盘
         reset();
-        if (handicap != 0) player = WHITE;
-        if (size == 19) {
-            handicap = Math.min(handicap, 9);
-            for (int i = 0; i < handicap; i++) {
-                int[] coordinates = coordinates19[i];
-                board[coordinates[0]][coordinates[1]] = BLACK;
-            }
-        } else if (size == 13) {
-            handicap = Math.min(handicap, 5);
-            for (int i = 0; i < handicap; i++) {
-                int[] coordinates = coordinates13[i];
-                board[coordinates[0]][coordinates[1]] = BLACK;
-            }
-        }
     }
 
     public Set<Point> getCapturedStones() {
